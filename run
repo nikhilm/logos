@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+export PALANTIR_PATH=`pwd`
+
+export NODE_PATH=\
+$NODE_PATH\
+:$PALANTIR_PATH\
+:$PALANTIR_PATH/deps/libxmljs
+
+node "$@"

@@ -1,0 +1,11 @@
+Palantir will become a XMPP server in node.js
+
+Uses libxmljs for parsing
+
+No SASL support yet
+
+Make it extensible
+
+Use prosody for inspiration
+
+Use Redis/JSON dumps for storage
