@@ -4,6 +4,7 @@ export PALANTIR_PATH=`pwd`
 export NODE_PATH=\
 $NODE_PATH\
 :$PALANTIR_PATH\
-:$PALANTIR_PATH/deps/libxmljs
+:$PALANTIR_PATH/deps/libxmljs\
+:~/workspace/node-libraries/sasljs
 
 node "$@"
