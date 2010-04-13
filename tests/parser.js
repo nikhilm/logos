@@ -23,7 +23,6 @@ var p2 = new parser.Parser();
 p2.addListener( "stanza", function(stanza) {
     assert.equal( stanza.name, 'presence', "Wrong stanza name, expected presence" );
     assert.equal( Object.keys(stanza.attrs).length, 1, "wrong no. of attributes" );
-    sys.debug(sys.inspect(stanza));
 });
 
 p2.parse( "<presence xml:lang='en'><show>dnd</show><status>Wooing Juliet</status><status xml:lang='cz'>Ja dvo&#x0159;&#x00ED;m Juliet</status></presence>" );

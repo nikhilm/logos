@@ -97,12 +97,12 @@ exports.Parser.prototype.endElement = function( elem, prefix, uri ) {
         var last = this._tagStack[this._tagStack.length-1];
         if( !last.children )
             last.children = {};
-        last.children[tag.name] = tag;
+        if( !last.children[tag.name] )
+            last.children[tag.name] = tag;
     }
 },
 
 exports.Parser.prototype.onCharacters = function(chars) {
-    sys.log(chars);
     if( this._tagStack.length == 0 ) {
         return;
     }
