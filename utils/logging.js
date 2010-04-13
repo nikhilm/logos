@@ -7,7 +7,7 @@ global.LOG_LEVEL = global.LOG_LEVEL || "info";
 var makeLogger = function(initLevel) {
     return function() {
         if( levels.indexOf(global.LOG_LEVEL) >= initLevel )
-            sys.debug( [].join.call( arguments, ' ' ) );
+            sys.debug( levels[initLevel] + ": " + [].join.call( arguments, ' ' ) );
     }
 }
 
