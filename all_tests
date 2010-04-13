@@ -12,3 +12,5 @@ echo "=== TESTS FAILED ==="
 exit $stat
 fi
 done
+
+echo "+++ ALL TESTS PASSED +++"
