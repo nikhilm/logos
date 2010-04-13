@@ -3,6 +3,7 @@ var sys = require("sys");
 var xml = require("libxmljs");
 var sasl = require("sasl");
 var events = require('events');
+var log = require('../utils/logging').log;
 
 Function.prototype.bind = (function() {
   var _slice = Array.prototype.slice;
@@ -72,6 +73,7 @@ exports.Parser = function() {
 sys.inherits( exports.Parser, events.EventEmitter );
 
 exports.Parser.prototype._errorHandler = function( err ) {
+    log( "debug", "Parser: parse error", err );
     this.emit( 'error', err );
 },
 
@@ -90,6 +92,7 @@ exports.Parser.prototype.endElement = function( elem, prefix, uri ) {
     var tag = this._tagStack.pop();
     if( this._tagStack.length == 0 ) {
         // time to emit a stanza
+        log( "debug", "Received stanza", tag.name );
         this.emit( 'stanza', tag );
     }
     else {
