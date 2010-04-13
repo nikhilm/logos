@@ -1,0 +1,12 @@
+#!/bin/bash
+
+for file in `ls tests/**/*.js`
+do
+./run $file
+stat=$?
+if [ $stat ]
+then
+echo "=== TESTS FAILED ==="
+exit $stat
+fi
+done
