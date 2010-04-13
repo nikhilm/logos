@@ -2,9 +2,11 @@
 
 for file in `ls tests/**/*.js`
 do
+
+echo -e "\nRunning $file"
 ./run $file
 stat=$?
-if [ $stat ]
+if [[ $stat -ne 0 ]]
 then
 echo "=== TESTS FAILED ==="
 exit $stat
