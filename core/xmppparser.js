@@ -60,6 +60,7 @@ var buildAttrs = function( attrs ) {
 
 exports.Parser = function() {
     events.EventEmitter.call(this);
+    this._streamOpen = false;
     this._tagStack = [];
     var self = this;
     this.parser = new xml.SaxPushParser( function(cb) {
@@ -74,10 +75,20 @@ sys.inherits( exports.Parser, events.EventEmitter );
 
 exports.Parser.prototype._errorHandler = function( err ) {
     log( "debug", "Parser: parse error", err );
-    this.emit( 'error', err );
+    this.emit( 'error', err, this._tagStack );
 },
 
 exports.Parser.prototype.startElement = function( elem, attrs, prefix, uri, namespaces ) {
+    if( elem == 'stream' && prefix == 'stream' ) {
+        this._streamOpen = true;
+        this.emit( 'streamOpen', buildAttrs(attrs) );
+        return;
+    }
+
+    if( !this._streamOpen ) {
+        this.emit( 'error', 'stream-not-open' );
+    }
+
     tag = {};
     tag.name = elem;
     tag.attrs = buildAttrs( attrs );
@@ -89,7 +100,17 @@ exports.Parser.prototype.startElement = function( elem, attrs, prefix, uri, name
 },
 
 exports.Parser.prototype.endElement = function( elem, prefix, uri ) {
+    if( elem == 'stream' && prefix == 'stream' ) {
+        this._streamOpen = false;
+        this.emit( 'streamClosed' );
+        return;
+    }
     var tag = this._tagStack.pop();
+    if( !tag ) {
+        // big doo doo
+        this.emit( 'error', 'invalid-xml' );
+    }
+
     if( this._tagStack.length == 0 ) {
         // time to emit a stanza
         log( "debug", "Received stanza", tag.name );
