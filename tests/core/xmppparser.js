@@ -1,6 +1,6 @@
 var sys = require('sys');
 var assert = require('assert');
-var parser = require('../../core/parser');
+var parser = require('../../core/xmppparser');
 
 var p = new parser.Parser();
 
