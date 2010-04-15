@@ -1,7 +1,6 @@
 var net = require("net");
 var sys = require("sys");
 var xml = require("libxmljs");
-var sasl = require("sasl");
 var events = require('events');
 var log = require('../utils/logging').log;
 
@@ -59,7 +58,6 @@ var buildAttrs = function( attrs ) {
  */
 
 exports.Parser = function() {
-    events.EventEmitter.call(this);
     this._streamOpen = false;
     this._tagStack = [];
     var self = this;
@@ -71,7 +69,7 @@ exports.Parser = function() {
     } );
 }
 
-sys.inherits( exports.Parser, events.EventEmitter );
+exports.Parser.prototype = Object.create(new events.EventEmitter());
 
 exports.Parser.prototype._errorHandler = function( err ) {
     log( "debug", "Parser: parse error", err );
