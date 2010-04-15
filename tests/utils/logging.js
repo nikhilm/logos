@@ -1,5 +1,8 @@
 var log = require('../../utils/logging').log;
 
+log("info", "If you see a SHOULD NOT be shown from this point on, thats BAD\n----------");
+// but there's no way to actually test for it
+
 // current level is info
 log( "info", "SHOULD be shown" );
 log( "error", "SHOULD NOT be shown" );
