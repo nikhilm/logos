@@ -17,3 +17,6 @@ deps/libxmljs/TODO
 *.log
 **/*.swo
 *.swp
+deps/sasljs/.lock-wscript
+deps/sasljs/build
+deps/sasljs/lib/binding_sasl.node
