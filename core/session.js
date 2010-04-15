@@ -1,4 +1,5 @@
 var sys = require('sys');
+var events = require('events');
 
 var c_parser = require('core/xmppparser');
 var log = require('utils/logging').log;
@@ -24,9 +25,6 @@ exports.Session = Session = function(connection) {
         // TODO completely validate the stream header
         // var ok = self.validateStream(attrs);
         // Including major minor version checks
-        //
-        function streamFeatures() {
-        }
 
         var doc = new xml.Document();
         // TODO plugin hostname
@@ -35,7 +33,7 @@ exports.Session = Session = function(connection) {
         // remove stream ending
         log("debug", "Opening reply stream", doc.toString().replace('/>', '>'));
         self.connection.write(doc.toString().replace('/>', '>'));
-        self.connection.write(streamFeatures());
+        self.writeStreamFeatures();
         self.ready = true;
     });
 
@@ -52,6 +50,40 @@ exports.Session = Session = function(connection) {
     connection.addListener('timeout', this.connectionError.bind(this));
     connection.addListener('error', this.connectionError.bind(this));
 }
+
+Session.prototype = Object.create(new events.EventEmitter());
+
+Session.prototype.writeStreamFeatures = function() {
+    // we register our function as a listener
+    // for stream features
+    // then we emit the event
+    // since event listeners are ordered
+    // ours is executed last, so we know
+    // that everyone has inserted their
+    // stream features by now
+    // then we can return
+    // modules should append
+    // to the end of features with
+    // a string containing the xml response
+    // contained within
+    // TODO register on the global event bus
+    var wait = true;
+    this.addListener('stream-features', function() {
+        wait = false;
+    });
+
+    features = ["<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>"];
+    // it might need more arguments other than
+    // session and session should probably contain
+    // more information about the connection
+    this.emit('stream-features', this, features);
+
+    while(wait) {
+    }
+
+    log("debug", "Stream features are", features);
+    this.connection.write("<stream:features>"+features.join('\n')+"</stream:features>");
+};
 
 Session.prototype.handleStanza = function(stanza) {
     log("debug", "Received stanza", sys.inspect(stanza));
