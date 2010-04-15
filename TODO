@@ -1,0 +1,6 @@
+* Add program wide event bus
+* Add SASL authentication as a module
+* Add in-band registration as a module
+* Create simple declarative xml structure validator
+* ...
+* ...Have fun!
