@@ -96,7 +96,6 @@ exports.Parser.prototype.startElement = function( elem, attrs, prefix, uri, name
     tag.prefix = prefix;
     tag.uri = uri;
     
-    sys.debug("@@@@@ "+elem+":"+namespaces.length);
     if( namespaces.length == 0 ) {
         tag.xmlns = null;
     }
