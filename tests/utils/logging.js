@@ -1,5 +1,11 @@
 var log = require('../../utils/logging').log;
 
+// This test is verbose
+// enable it only when required
+enabled = false;
+
+if( enabled ) {
+
 log("info", "If you see a SHOULD NOT be shown from this point on, thats BAD\n----------");
 // but there's no way to actually test for it
 
@@ -31,3 +37,5 @@ log( "debug", "SHOULD NOT be shown" );
 global.LOG_LEVEL = "debug";
 
 log( "invalid", "SHOULD NOT be shown" );
+
+}

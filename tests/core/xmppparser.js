@@ -26,15 +26,12 @@ var p2_error = false;
 var p2_stream_opened = false;
 var p2_stream_closed = false;
 p2.addListener( "error", function(msg) {
-    sys.debug( "Parser 2: error: " + msg );
     p2_error = true;
 });
 p2.addListener( "streamOpen", function(attrs) {
-    sys.debug("Parser 2: stream opened " + sys.inspect(attrs));
     p2_stream_opened = true;
 });
 p2.addListener( "streamClosed", function() {
-    sys.debug("Parser 2: stream closed ");
     p2_stream_closed = true;
 });
 p2.addListener( "stanza", function(stanza) {
@@ -56,14 +53,7 @@ p2.parse( "<?xml version='1.0'?><stream:stream to='example.com' xmlns='jabber:cl
 var p3 = new parser.Parser();
 var p3_error = false;
 p3.addListener( "error", function(msg) {
-    sys.debug( "Parser 3: WE WANT AN ERROR: Ignore this error: " + msg );
     p3_error = true;
-});
-p3.addListener( "streamOpen", function(attrs) {
-    sys.debug("Parser 3: stream opened " + sys.inspect(attrs));
-});
-p3.addListener( "streamClosed", function() {
-    sys.debug("Parser 3: stream closed ");
 });
 process.addListener('exit', function() {
     assert.ok( p3_error );
