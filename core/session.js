@@ -15,10 +15,10 @@ exports.Session = Session = function(connection) {
     this.parser = new c_parser.Parser();
 
     var self = this;
-    this.parser.addListener( "streamOpen", function(attrs) {
-        log( "debug", "stream opened", sys.inspect(attrs) );
+    this.parser.addListener( "streamOpen", function(stream) {
+        log( "debug", "stream opened");
 
-        if( !attrs['version'] || attrs['version'].value != '1.0' ) {
+        if( !stream.attrs['version'] || stream.attrs['version'].value != '1.0' ) {
             log("debug", "Unsupported stream version", self.connection.remoteAddress);
             self.streamError('unsupported-version', "Requires 1.0");
             self.endConnection();
