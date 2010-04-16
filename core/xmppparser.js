@@ -42,6 +42,19 @@ var buildAttrs = function( attrs ) {
     return a;
 }
 
+var buildNS = function( ns ) {
+    return { name: ns[1], prefix: ns[0] };
+}
+
+var buildNSes = function( nses ) {
+    var a = {};
+    nses.forEach( function(i) {
+        var ns = buildNS( i );
+        a[ns.name] = ns;
+    } );
+    return a;
+}
+
 /**
  * A XMPP parser
  * Assumes SASL handling is done
@@ -77,22 +90,32 @@ exports.Parser.prototype._errorHandler = function( err ) {
 },
 
 exports.Parser.prototype.startElement = function( elem, attrs, prefix, uri, namespaces ) {
+    tag = {};
+    tag.name = elem;
+    tag.attrs = buildAttrs( attrs );
+    tag.prefix = prefix;
+    tag.uri = uri;
+    
+    sys.debug("@@@@@ "+elem+":"+namespaces.length);
+    if( namespaces.length == 0 ) {
+        tag.xmlns = null;
+    }
+    else if( namespaces.length == 1 ) {
+        tag.xmlns = buildNS(namespaces[0]);
+    }
+    else {
+        tag.xmlns = buildNSes(namespaces);
+    }
+
     if( elem == 'stream' && prefix == 'stream' ) {
         this._streamOpen = true;
-        this.emit( 'streamOpen', buildAttrs(attrs) );
+        this.emit( 'streamOpen', tag );
         return;
     }
 
     if( !this._streamOpen ) {
         this.emit( 'error', 'stream-not-open' );
     }
-
-    tag = {};
-    tag.name = elem;
-    tag.attrs = buildAttrs( attrs );
-    tag.prefix = prefix;
-    tag.uri = uri;
-    tag.namespaces = namespaces;
 
     this._tagStack.push( tag );
 },
