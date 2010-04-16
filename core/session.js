@@ -55,6 +55,12 @@ exports.Session = Session = function(connection) {
 
 Session.prototype = Object.create(new events.EventEmitter());
 
+// just to abstract stuff from other components
+// like plugins
+Session.prototype.write = function(data) {
+    this.connection.write(data);
+}
+
 Session.prototype.writeStreamFeatures = function() {
     // we register our function as a listener
     // for stream features
@@ -90,6 +96,7 @@ Session.prototype.writeStreamFeatures = function() {
 
 Session.prototype.handleStanza = function(stanza) {
     log("debug", "Received stanza", sys.inspect(stanza));
+    eventbus.emit("stanza", this, stanza);
 }
 
 Session.prototype.endConnection = function() {
