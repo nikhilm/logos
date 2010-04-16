@@ -3,14 +3,15 @@ var net = require('net');
 
 var log = require('utils/logging').log;
 var c_session = require('core/session');
+var c_modulemanager = require('core/modulemanager');
 
 // TODO fix log level on release
 global.LOG_LEVEL = "debug";
 
 // TODO load config
 // TODO load plugins
-require('plugins/mod_register');
-require('plugins/mod_sasl');
+c_modulemanager.load('mod_register');
+c_modulemanager.load('mod_sasl');
 
 var handleConnection = function(stream) {
     stream.setEncoding('utf8');
