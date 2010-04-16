@@ -2,8 +2,10 @@ var sys = require('sys');
 var events = require('events');
 
 var c_parser = require('core/xmppparser');
-var log = require('utils/logging').log;
 var xml = require('libxmljs');
+
+var log = require('utils/logging').log;
+var eventbus = require('core/eventbus').instance;
 
 exports.Session = Session = function(connection) {
     this.connection = connection;
@@ -68,7 +70,7 @@ Session.prototype.writeStreamFeatures = function() {
     // contained within
     // TODO register on the global event bus
     var wait = true;
-    this.addListener('stream-features', function() {
+    eventbus.addListener('stream-features', function() {
         wait = false;
     });
 
@@ -76,12 +78,13 @@ Session.prototype.writeStreamFeatures = function() {
     // it might need more arguments other than
     // session and session should probably contain
     // more information about the connection
-    this.emit('stream-features', this, features);
+    eventbus.emit('stream-features', this, features);
 
     while(wait) {
     }
 
     log("debug", "Stream features are", features);
+    //TODO remove our fake listener
     this.connection.write("<stream:features>"+features.join('\n')+"</stream:features>");
 };
 

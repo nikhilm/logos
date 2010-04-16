@@ -9,6 +9,8 @@ global.LOG_LEVEL = "debug";
 
 // TODO load config
 // TODO load plugins
+require('plugins/mod_register');
+require('plugins/mod_sasl');
 
 var handleConnection = function(stream) {
     stream.setEncoding('utf8');
