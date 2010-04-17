@@ -97,7 +97,7 @@ exports.Parser.prototype.startElement = function( elem, attrs, prefix, uri, name
     tag.uri = uri;
     
     if( namespaces.length == 0 ) {
-        tag.xmlns = null;
+        tag.xmlns = {};
     }
     else if( namespaces.length == 1 ) {
         tag.xmlns = buildNS(namespaces[0]);
