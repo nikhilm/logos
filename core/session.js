@@ -95,7 +95,6 @@ Session.prototype.writeStreamFeatures = function() {
 };
 
 Session.prototype.handleStanza = function(stanza) {
-    log("debug", "Received stanza", sys.inspect(stanza));
     eventbus.emit("stanza", this, stanza);
 }
 
