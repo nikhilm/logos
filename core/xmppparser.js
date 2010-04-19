@@ -14,19 +14,6 @@ var buildAttrs = function( attrs ) {
     return a;
 }
 
-var buildNS = function( ns ) {
-    return { name: ns[1], prefix: ns[0] };
-}
-
-var buildNSes = function( nses ) {
-    var a = {};
-    nses.forEach( function(i) {
-        var ns = buildNS( i );
-        a[ns.name] = ns;
-    } );
-    return a;
-}
-
 /**
  * A XMPP parser
  * Assumes SASL handling is done
@@ -63,6 +50,17 @@ exports.Parser.prototype._errorHandler = function( err ) {
 
 exports.Parser.prototype.startElement = function( elem, attrs, prefix, uri, namespaces ) {
     tag = new Stanza(elem, buildAttrs(attrs));
+
+    function insertNS(tag, prefix, uri) {
+        var name = (prefix ? ":" + prefix : "");
+        tag.attrs["xmlns" + name] = uri;
+    }
+
+
+    insertNS(tag, prefix, uri);
+    namespaces.forEach(function(ns) {
+        insertNS(tag, ns[0], ns[1]);
+    });
     
     if( elem == 'stream' && prefix == 'stream' ) {
         this._streamOpen = true;
@@ -91,7 +89,6 @@ exports.Parser.prototype.endElement = function( elem, prefix, uri ) {
 
     if( this._tagStack.length == 0 ) {
         // time to emit a stanza
-        log( "debug", "Received stanza", tag.name );
         this.emit( 'stanza', tag );
     }
     else {
