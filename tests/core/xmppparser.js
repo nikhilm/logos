@@ -11,8 +11,9 @@ p.addListener( "error", function(msg) {
 
 p.addListener( "stanza", function(stanza) {
     assert.equal( stanza.name, 'message', "Wrong stanza name, expected message" );
-    assert.equal( Object.keys(stanza.attrs).length, 4, "wrong no. of attributes" );
-    assert.ok( stanza.children['body'] );
+    // 5 is attributes + xmlns
+    assert.equal( Object.keys(stanza.attrs).length, 5, "wrong no. of attributes" );
+    assert.ok( stanza.c('body') );
     assert.equal( stanza.a('from'), 'juliet@example.com/balcony' );
 });
 
@@ -35,7 +36,7 @@ p2.addListener( "streamClosed", function() {
 });
 p2.addListener( "stanza", function(stanza) {
     assert.equal( stanza.name, 'presence', "Wrong stanza name, expected presence" );
-    assert.equal( Object.keys(stanza.attrs).length, 1, "wrong no. of attributes" );
+    assert.equal( Object.keys(stanza.attrs).length, 2, "wrong no. of attributes" );
 });
 
 process.addListener('exit', function() {
