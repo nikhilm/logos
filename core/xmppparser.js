@@ -3,21 +3,13 @@ var net = require("net");
 var sys = require("sys");
 var xml = require("libxmljs");
 var events = require('events');
+var Stanza = require('../utils/stanza').Stanza;
 var log = require('../utils/logging').log;
-
-var buildAttr = function( attr ) {
-    return { name : attr[0]
-           , prefix : attr[1]
-           , uri : attr[2]
-           , value : attr[3]
-           };
-}
 
 var buildAttrs = function( attrs ) {
     var a = {};
-    attrs.forEach( function(i) {
-        var attr = buildAttr( i );
-        a[attr.name] = attr;
+    attrs.forEach( function(attr) {
+        a[attr[0]] = attr[3];
     } );
     return a;
 }
@@ -70,22 +62,8 @@ exports.Parser.prototype._errorHandler = function( err ) {
 },
 
 exports.Parser.prototype.startElement = function( elem, attrs, prefix, uri, namespaces ) {
-    tag = {};
-    tag.name = elem;
-    tag.attrs = buildAttrs( attrs );
-    tag.prefix = prefix;
-    tag.uri = uri;
+    tag = new Stanza(elem, buildAttrs(attrs));
     
-    if( namespaces.length == 0 ) {
-        tag.xmlns = {};
-    }
-    else if( namespaces.length == 1 ) {
-        tag.xmlns = buildNS(namespaces[0]);
-    }
-    else {
-        tag.xmlns = buildNSes(namespaces);
-    }
-
     if( elem == 'stream' && prefix == 'stream' ) {
         this._streamOpen = true;
         this.emit( 'streamOpen', tag );
@@ -119,10 +97,7 @@ exports.Parser.prototype.endElement = function( elem, prefix, uri ) {
     else {
         // put this as the child of parent
         var last = this._tagStack[this._tagStack.length-1];
-        if( !last.children )
-            last.children = {};
-        if( !last.children[tag.name] )
-            last.children[tag.name] = tag;
+        last.appendChild(tag);
     }
 },
 
@@ -132,9 +107,9 @@ exports.Parser.prototype.onCharacters = function(chars) {
     }
 
     var top = this._tagStack[this._tagStack.length-1];
-    if( !top.text )
-        top.text = "";
-    top.text += chars;
+    if( !top.t() )
+        top.t("");
+    top.t( top.t() + chars );
 },
 
 exports.Parser.prototype.parse = function( data ) {

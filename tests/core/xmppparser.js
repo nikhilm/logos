@@ -13,7 +13,7 @@ p.addListener( "stanza", function(stanza) {
     assert.equal( stanza.name, 'message', "Wrong stanza name, expected message" );
     assert.equal( Object.keys(stanza.attrs).length, 4, "wrong no. of attributes" );
     assert.ok( stanza.children['body'] );
-    assert.equal( stanza.attrs['from'].value, 'juliet@example.com/balcony' );
+    assert.equal( stanza.a('from'), 'juliet@example.com/balcony' );
 });
 
 p.parse( "<?xml version='1.0'?><stream:stream to='example.com' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams' version='1.0'><message to='romeo@example.net' from='juliet@example.com/balcony' type='chat' xml:lang='en'> <body>Wherefore art thou, Romeo?</body> </message></stream:stream>");
