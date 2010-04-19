@@ -1,29 +1,9 @@
+require('proto');
 var net = require("net");
 var sys = require("sys");
 var xml = require("libxmljs");
 var events = require('events');
 var log = require('../utils/logging').log;
-
-Function.prototype.bind = (function() {
-  var _slice = Array.prototype.slice;
-  return function(context) {
-    var fn = this,
-        args = _slice.call(arguments, 1);
-    
-    if (args.length) { 
-      return function() {
-        return arguments.length
-          ? fn.apply(context, args.concat(_slice.call(arguments)))
-          : fn.apply(context, args);
-      }
-    } 
-    return function() {
-      return arguments.length
-        ? fn.apply(context, arguments)
-        : fn.call(context);
-    }; 
-  }
-})();
 
 var buildAttr = function( attr ) {
     return { name : attr[0]
