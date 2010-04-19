@@ -87,8 +87,6 @@ c_module.handleStanza('auth', function(session, auth) {
         session.connection.end();
     }
 
-    sys.debug(sys.inspect(auth));
-        sys.debug("In auth " + auth.a('xmlns'));
     if( auth.a('xmlns') != SASL_NS ) {
         session.connection.end();
     }
