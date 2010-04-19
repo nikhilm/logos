@@ -1,3 +1,4 @@
+//TODO Improve text tag handling, preserve sequence
 require('proto');
 
 var sys = require('sys');
@@ -9,31 +10,29 @@ exports.Stanza = Stanza = function(name, attrs, text) {
     assert.ok(name);
     this.name = name;
     
-    this._children = {};
-    this._attrs = attrs || {};
+    this.children = {};
+    this.attrs = attrs || {};
     this.text = text || "";
     return this;
 }
 
-// private API
-Stanza.prototype._appendChild = function(stanza) {
+// public API
+Stanza.prototype.appendChild = function(stanza) {
     stanza._parent = this;
-    if( typeof(this._children[stanza.name]) == 'undefined' ) {
-        this._children[stanza.name] = stanza;
+    if( typeof(this.children[stanza.name]) == 'undefined' ) {
+        this.children[stanza.name] = stanza;
     }
-    else if( Array.isArray(this._children[stanza.name]) ) {
-        this._children[stanza.name].push(stanza);
+    else if( Array.isArray(this.children[stanza.name]) ) {
+        this.children[stanza.name].push(stanza);
     }
     else {
-        this._children[stanza.name] = [ this._children[stanza.name] ];
-        this._children[stanza.name].push(stanza);
+        this.children[stanza.name] = [ this.children[stanza.name] ];
+        this.children[stanza.name].push(stanza);
     }
 }
-
-// public API
 Stanza.prototype.tag = function(name, attrs, text) {
     var stanza = new Stanza(name, attrs, text);
-    this._appendChild(stanza);
+    this.appendChild(stanza);
     return stanza;
 }
 
@@ -51,12 +50,26 @@ Stanza.prototype.root = function() {
 
 // child
 Stanza.prototype.c = function(name) {
-    return this._children[name];
+    return this.children[name];
 }
 
 // attribute
 Stanza.prototype.a = function(name) {
-    return this._attrs[name];
+    return this.attrs[name];
+}
+
+// set or get text
+// set -> t("new text") -> returns the Stanza to allow
+// chaining
+// get -> t() -> returns the text
+Stanza.prototype.t = function() {
+    if( typeof(arguments[0]) == "string" ) {
+        this.text = arguments[0];
+        return this;
+    }
+    else {
+        return this.text;
+    }
 }
 
 /*
@@ -66,24 +79,24 @@ Stanza.prototype.a = function(name) {
 Stanza.prototype.toString = function() {
     var str = '<' + this.name;
 
-    var attrs = this._attrs;
+    var attrs = this.attrs;
     Object.keys(attrs).forEach(function(attr) {
         str += ' ' + attr + '="' + attrs[attr] + '"';
     });
 
     str += '>' + this.text;
 
-    var childKeys = Object.keys(this._children);
+    var childKeys = Object.keys(this.children);
 
     var stanza = this;
     childKeys.forEach(function(tag) {
-        if( Array.isArray(stanza._children[tag]) ) {
-            stanza._children[tag].forEach( function(elt) {
+        if( Array.isArray(stanza.children[tag]) ) {
+            stanza.children[tag].forEach( function(elt) {
                 str += elt.toString();
             });
         }
         else {
-            str += stanza._children[tag].toString();
+            str += stanza.children[tag].toString();
         }
     });
 

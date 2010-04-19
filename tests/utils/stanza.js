@@ -14,6 +14,9 @@ st = (new Stanza("iq"))
 assert.equal(st.name, "iq");
 assert.equal(st.c("message").a("from"), "nsm.nikhil");
 assert.ok( Array.isArray(st.c("error")));
+assert.equal(st.c("message").t(), "What's up?");
+assert.notEqual(typeof(st.c("message").t("simple")), "string");
+assert.equal(st.c("message").t(), "simple");
 
 st = new Stanza("bling");
 
