@@ -10,26 +10,22 @@ exports.Stanza = Stanza = function(name, attrs, text) {
     assert.ok(name);
     this.name = name;
     
-    this.children = {};
+    this.children = [];
     this.attrs = attrs || {};
-    this.text = text || "";
+
+    if( typeof(text) == "string" )
+        this.appendChild(text);
     return this;
 }
 
 // public API
 Stanza.prototype.appendChild = function(stanza) {
-    stanza._parent = this;
-    if( typeof(this.children[stanza.name]) == 'undefined' ) {
-        this.children[stanza.name] = stanza;
+    if( typeof(stanza) != "string" ) {
+        stanza._parent = this;
     }
-    else if( Array.isArray(this.children[stanza.name]) ) {
-        this.children[stanza.name].push(stanza);
-    }
-    else {
-        this.children[stanza.name] = [ this.children[stanza.name] ];
-        this.children[stanza.name].push(stanza);
-    }
+    this.children.push(stanza);
 }
+
 Stanza.prototype.tag = function(name, attrs, text) {
     var stanza = new Stanza(name, attrs, text);
     this.appendChild(stanza);
@@ -48,9 +44,21 @@ Stanza.prototype.root = function() {
     return r;
 }
 
-// child
+// first child
 Stanza.prototype.c = function(name) {
-    return this.children[name];
+    for( var i = 0; i < this.children.length; ++i ) {
+        var elt = this.children[i];
+        if( typeof(elt) != "string" && name == elt.name ) {
+            return elt;
+        }
+    }
+}
+
+// all children
+Stanza.prototype.cs = function(name) {
+    return this.children.filter(function(elt) {
+        return typeof(elt) != "string" && name == elt.name;
+    });
 }
 
 // attribute
@@ -58,18 +66,46 @@ Stanza.prototype.a = function(name) {
     return this.attrs[name];
 }
 
-// set or get text
-// set -> t("new text") -> returns the Stanza to allow
-// chaining
-// get -> t() -> returns the text
+/* add or get text
+ * add a new text node -> t("new text") -> returns the Stanza to allow
+ * chaining
+ * get -> t() -> returns all the text concatenated together
+ * if there are XML children, there text is also taken
+ * if you want the elements themselves too, use
+ * content()
+ */
 Stanza.prototype.t = function() {
     if( typeof(arguments[0]) == "string" ) {
-        this.text = arguments[0];
+        this.appendChild(arguments[0]);
         return this;
     }
     else {
-        return this.text;
+        var text = [];
+        this.children.forEach(function(child) {
+            if( typeof(child) == "string" )
+                text.push(child);
+            else
+                text.push(child.t());
+        });
+        return text.join('');
     }
+}
+
+// clear all text nodes and set this one as the first child
+Stanza.prototype.setText = function(text) {
+    this.children = this.children.filter(function(elt) {
+        return typeof(elt) != "string";
+    });
+
+    this.children.push(text);
+}
+
+Stanza.prototype.content = function() {
+    return this.children.map(function(elt) {
+        if( typeof(elt) == "string" )
+            return elt;
+        return elt.toString();
+    }).join('');
 }
 
 /*
@@ -84,19 +120,15 @@ Stanza.prototype.toString = function() {
         str += ' ' + attr + '="' + attrs[attr] + '"';
     });
 
-    str += '>' + this.text;
-
-    var childKeys = Object.keys(this.children);
+    str += '>';
 
     var stanza = this;
-    childKeys.forEach(function(tag) {
-        if( Array.isArray(stanza.children[tag]) ) {
-            stanza.children[tag].forEach( function(elt) {
-                str += elt.toString();
-            });
+    this.children.forEach(function(child) {
+        if( typeof(child) == "string" ) {
+            str += child;
         }
         else {
-            str += stanza.children[tag].toString();
+            str += child.toString();
         }
     });
 
