@@ -2,7 +2,7 @@ var sys = require('sys');
 var events = require('events');
 
 var c_parser = require('core/xmppparser');
-var xml = require('libxmljs');
+var Stanza = require('utils/stanza').Stanza;
 
 var log = require('utils/logging').log;
 var eventbus = require('core/eventbus').instance;
@@ -18,7 +18,7 @@ exports.Session = Session = function(connection) {
     this.parser.addListener( "streamOpen", function(stream) {
         log( "debug", "stream opened");
 
-        if( !stream.attrs['version'] || stream.attrs['version'].value != '1.0' ) {
+        if( stream.a('version') != '1.0' ) {
             log("debug", "Unsupported stream version", self.connection.remoteAddress);
             self.streamError('unsupported-version', "Requires 1.0");
             self.endConnection();
@@ -28,13 +28,16 @@ exports.Session = Session = function(connection) {
         // var ok = self.validateStream(attrs);
         // Including major minor version checks
 
-        var doc = new xml.Document();
         // TODO plugin hostname
         // TODO generate random id
-        doc.node('stream:stream', {from: 'localhost', id: 'xyzzy', xmlns: 'jabber:client', 'xmlns:stream': 'http://etherx.jabber.org/streams', version: '1.0'});
+        var doc = new Stanza("stream:stream", {from: 'localhost'
+                                              ,id: 'xyzzy'
+                                              ,xmlns: 'jabber:client'
+                                              ,'xmlns:stream': 'http://etherx.jabber.org/streams'
+                                              ,version: '1.0'});
         // remove stream ending
-        log("debug", "Opening reply stream", doc.toString().replace('/>', '>'));
-        self.connection.write(doc.toString().replace('/>', '>'));
+        log("debug", "Opening reply stream");
+        self.connection.write(doc.toString().replace('</stream:stream>', ''));
         self.writeStreamFeatures();
         self.ready = true;
     });
@@ -112,11 +115,10 @@ Session.prototype.connectionError = function() {
  * streamError(error[, reason])
  */
 Session.prototype.streamError = function(error) {
-    var doc = new xml.Document();
-    doc.node('stream:error')
-      .node(error, {xmlns: 'urn:ietf:params:xml:ns:xmpp-streams'})
-      .parent()
-      .node('text', {xmlns: 'urn:ietf:params:xml:ns:xmpp-streams', 'xml:lang': 'en'}, arguments[0] || error );
+    var doc = new Stanza("stream:error");
+    doc.tag(error, {xmlns: 'urn:ietf:params:xml:ns:xmpp-streams'})
+          .parent()
+      .tag('text', {xmlns: 'urn:ietf:params:xml:ns:xmpp-streams', 'xml:lang': 'en'}, arguments[0] || error );
 
     log("debug", "Stream error", error, doc.toString());
     this.connection.write(doc.toString());

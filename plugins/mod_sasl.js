@@ -1,7 +1,7 @@
 var sys = require('sys');
 
 var sasl = require('sasl');
-var xml = require('libxmljs');
+var Stanza = require('../utils/stanza').Stanza;
 
 var c_module = require('../core/modulemanager');
 var log = require('../utils/logging').log;
@@ -47,32 +47,16 @@ c_module.hook('stream-features', function(session, features) {
     features.push(mechs);
 });
 
-// TODO move this to utils and rename
-var xmlClean = function(doc) {
-    log("debug", "Clean and write", doc.toString());
-    return doc.toString().replace(/^<\?xml.*\?>/, "");
-}
-
 var success = function(payload) {
-    return xmlClean(
-        (new xml.Document())
-        .node("success", {xmlns: SASL_NS}, payload ? payload : "" )
-    );
+    return new Stanza("success", {xmlns: SASL_NS}, payload ? payload : "" ).toString();
 }
 
 var failure = function(error) {
-    return xmlClean(
-        (new xml.Document())
-        .node("failure", {xmlns: SASL_NS})
-         .node(error)
-    );
+    return (new Stanza("failure", {xmlns: SASL_NS}).tag(error)).root().toString();
 }
 
 var challenge = function(payload) {
-    return xmlClean(
-        (new xml.Document())
-        .node("challenge", {xmlns: SASL_NS}, payload)
-    );
+    return (new Stanza("challenge", {xmlns: SASL_NS}, payload)).toString();
 }
 
 var performSaslStep = function(session, response) {
@@ -93,26 +77,28 @@ var performSaslStep = function(session, response) {
         session.saslHandler.tries++;
         session.write(failure('temporary-auth-failure'));
         if( session.saslHandler.tries > MAX_TRIES ) {
-            session.connection.close();
+            session.connection.end();
         }
     }
 }
 
 c_module.handleStanza('auth', function(session, auth) {
     if( typeof(session.saslHandler) == "undefined" ) {
-        session.connection.close();
+        session.connection.end();
     }
 
-    if( auth.xmlns.name != SASL_NS ) {
-        session.connection.close();
+    sys.debug(sys.inspect(auth));
+        sys.debug("In auth " + auth.a('xmlns'));
+    if( auth.a('xmlns') != SASL_NS ) {
+        session.connection.end();
     }
 
-    var mech = (typeof(auth.attrs['mechanism']) == "undefined" ? null : auth.attrs['mechanism'].value);
+    var mech = (typeof(auth.a('mechanism')) == "undefined" ? null : auth.a('mechanism'));
     if( !mech ) {
-        session.connection.close();
+        session.connection.end();
     }
 
-    var initialResponse = (typeof(auth.text) == "undefined" ? "" : auth.text);
+    var initialResponse = (typeof(auth.t()) == "undefined" ? "" : auth.t());
 
     session.saslHandler.start(mech);
 
@@ -121,11 +107,11 @@ c_module.handleStanza('auth', function(session, auth) {
 
 c_module.handleStanza('response', function(session, resp) {
     //TODO Again move namespace checking upwards
-    if( resp.xmlns.name != SASL_NS )
+    if( resp.a('xmlns') != SASL_NS )
         return;
 
-    if( !resp.text )
-        resp.text = "";
+    if( !resp.t() )
+        resp.t("");
 
-    performSaslStep(session, resp.text);
+    performSaslStep(session, resp.t());
 });
