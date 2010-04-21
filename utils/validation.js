@@ -39,13 +39,18 @@ var log = require('./logging').log;
  * The error will be logged if debug mode is on though.
  */
 
-// decides what to do based on regex/string
+// decides what to do based on regex/string/function
 Stanza.prototype._equal = function(pat, text) {
+    // NOTE order of checking of regex then function
+    // is important since a regex is a function.
     if( typeof(pat) == "string" ) {
 	return pat == text;
     }
     else if( pat.exec ) {
 	return pat.test(text);
+    }
+    else if( typeof(pat) == "function" ) {
+	return pat(text);
     }
 }
 
