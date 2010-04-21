@@ -21,3 +21,5 @@ deps/sasljs/.lock-wscript
 deps/sasljs/build
 deps/sasljs/lib/binding_sasl.node
 loc
+doc/*.3.html
+doc/**/*.3.html
