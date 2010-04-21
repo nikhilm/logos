@@ -2,6 +2,7 @@ var sys = require('sys');
 
 var sasl = require('sasl');
 var Stanza = require('../utils/stanza').Stanza;
+require('../utils/validation');
 
 var c_module = require('../core/modulemanager');
 var log = require('../utils/logging').log;
@@ -63,6 +64,7 @@ var performSaslStep = function(session, response) {
     var reply = session.saslHandler.step( response );
     if( reply.status == sasl.GSASL_OK ) {
         log("debug", "SASL Authentication succeeded");
+	session.setAuthenticated();
         session.write(success());
     }
     else if( reply.status == sasl.GSASL_NEEDS_MORE ) {
@@ -87,26 +89,33 @@ c_module.handleStanza('auth', function(session, auth) {
         session.connection.end();
     }
 
-    if( auth.a('xmlns') != SASL_NS ) {
-        session.connection.end();
+    if( !auth.valid( {
+	attrs: {
+	    xmlns: SASL_NS
+	    ,mechanism: function(mech) {
+		return session.saslHandler.mechanisms.indexOf(mech) != -1;
+	    }
+	} }) ) {
+	log("debug", "<auth/> reply did not conform");
+	session.connection.end();
     }
 
-    var mech = (typeof(auth.a('mechanism')) == "undefined" ? null : auth.a('mechanism'));
-    if( !mech ) {
+    if( auth.a('xmlns') != SASL_NS ) {
         session.connection.end();
     }
 
     var initialResponse = (typeof(auth.t()) == "undefined" ? "" : auth.t());
 
-    session.saslHandler.start(mech);
+    session.saslHandler.start(auth.a("mechanism"));
 
     performSaslStep(session, initialResponse);
 });
 
 c_module.handleStanza('response', function(session, resp) {
     //TODO Again move namespace checking upwards
-    if( resp.a('xmlns') != SASL_NS )
-        return;
+    if( !resp.valid({ attrs: { xmlns: SASL_NS } }) ) {
+	log("debug", "Invalid <response/>");
+    }
 
     if( !resp.t() )
         resp.t("");
