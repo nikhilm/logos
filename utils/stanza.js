@@ -52,6 +52,7 @@ Stanza.prototype.c = function(name) {
             return elt;
         }
     }
+    return null;
 }
 
 // all children
