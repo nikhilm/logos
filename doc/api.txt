@@ -1,0 +1,44 @@
+palantir-api(3) - Palantir API
+==============================
+
+## SYNOPSIS
+
+The Palantir API documents the public functions provided
+by Palantir core modules to allow writing plugins to add
+XMPP features. It is meant to be a reference for developers.
+Users should check out the palantir(1) documentation.
+
+## API Overview
+
+The **Palantir API** is divided into the following modules:
+
+ * [util/stanza](utils/stanza.3.html):
+ Internal XMPP Stanza objects
+ * [util/validation](utils/validation.3.html):
+ Generic XMPP Stanza validator
+ * [util/logging](utils/logging.3.html):
+ Logging and debugging function
+ * [core/session](core/session.3.html):
+ Manages invidual connections to the server.
+ * [core/modulemanager](core/modulemanager.3.html):
+x Provides functions to allow plugins to be notified of events and so on.
+ * [core/eventbus](core/eventbus.3.html):
+ A session wide `EventEmitter` for communication and notifications.
+ * [core/config](core/config.3.html):
+ Access configuration information.
+ * [core/xmppparser](core/xmppparser.3.html):
+ Parses incoming XML from clients or other servers.
+
+## Plugins
+
+Plugins are Javascript modules which add extra functionality to **Palantir**. This may involve supporting extra transports, using a different wire protocol ( eg. BOSH ) or some thing wacky like bots.
+
+**TODO**: Write info about writing plugins.
+
+## AUTHORS
+
+Nikhil Marathe. See AUTHORS for full list of contributors.
+
+## SEE ALSO
+
+palantir(1), palantir-plugins(3), palantir-stanza(3), palantir-validation(3), palantir-logging(3), palantir-session(3), palantir-modulemanager(3), palantir-eventbus(3), palantir-config(3), palantir-xmppparser(3), node(1)

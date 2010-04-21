@@ -1,0 +1,47 @@
+palantir-eventbus(3) - Palantir Event Bus
+==============================================
+
+## SYNOPSIS
+
+The Event Bus is an `EventEmitter` shared across the session and acts
+like a global, asynchronous dispatch system.
+
+## DESCRIPTION
+
+To use the Event Bus, require it:
+
+    var eventbus = new require('eventbus').EventBus();
+    
+But you will usually want to use the one provided by the session
+since that is the only one that other `Palantir` components will
+be listening on. If you have a `session` you can simply do:
+
+    session.eventbus.function(...)
+    
+[**Plugins**](../api.3.html) are provided various utilities by the
+[`Module Manager`](modulemanager.3.html) and do not usually need
+to access the bus directly.
+
+### eventbus.addListener(event, listener)
+
+Add a listener for the particular event
+
+    eventbus.addListener('stanza', function(stanza) {
+        ...
+    });
+
+Note that the arguments passed to the function are specific to
+each event and can usually be found in that event's documentation.
+
+### eventbus.emit(event, arg1, arg2, ...)
+
+Emit a event with the arguments to pass to registered listeners.
+
+### Others
+
+For full documentation, see the [node.js](http://nodejs.org/api.html) `EventEmitter` object.
+
+
+## AUTHORS
+
+Nikhil Marathe
