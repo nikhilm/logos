@@ -7,6 +7,7 @@
 #include <libxml/parser.h>
 #include <libxml/parserInternals.h>
 #include <libxml/xmlstring.h>
+#include <libxml/xmlsave.h>
 #include <libxml/xpath.h>
 #include <libxml/xpathInternals.h>
 #include <libxml/HTMLparser.h>
@@ -84,7 +85,7 @@ class LibXMLJS {
 
 }  // namespace libxmljs
 
-#include "./natives.h"
-#include "./object_wrap.h"
+#include "natives.h"
+#include "object_wrap.h"
 
 #endif  // SRC_LIBXMLJS_H_

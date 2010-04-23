@@ -1,21 +1,16 @@
 // Copyright 2009, Squish Tech, LLC.
-#include "./xml_namespace.h"
-#include "./xml_node.h"
+#include "xml_namespace.h"
+#include "xml_node.h"
 
 namespace libxmljs {
 
 v8::Persistent<v8::FunctionTemplate> XmlNamespace::constructor_template;
 
 v8::Handle<v8::Value>
-XmlNamespace::New(xmlNs* ns) {
-  return LXJS_GET_MAYBE_BUILD(XmlNamespace, ns);
-}
-
-v8::Handle<v8::Value>
 XmlNamespace::New(const v8::Arguments& args) {
   v8::HandleScope scope;
   if (args[0]->StrictEquals(v8::Null()))
-    return args.This();
+      return scope.Close(args.This());
 
   // TODO(sprsquish): ensure this is an actual Node object
   if (!args[0]->IsObject())
@@ -31,21 +26,15 @@ XmlNamespace::New(const v8::Arguments& args) {
 
   href = new v8::String::Utf8Value(args[2]->ToString());
 
-  XmlNamespace *ns = new XmlNamespace(node->xml_obj,
-                                prefix ? **prefix : NULL,
-                                **href);
-  delete prefix;
+  xmlNs* ns = xmlNewNs(node->xml_obj,
+                       (const xmlChar*)**href,
+                       prefix ? (const xmlChar*)**prefix : NULL);
+
+  if (prefix)
+    delete prefix;
   delete href;
 
-  return LXJS_GET_MAYBE_BUILD(XmlNamespace, ns->xml_obj);
-}
-
-XmlNamespace::XmlNamespace(xmlNode* node,
-                     const char* prefix,
-                     const char* href) {
-  xml_obj = xmlNewNs(node,
-                     (const xmlChar*)href,
-                     (const xmlChar*)prefix);
+  return LXJS_GET_MAYBE_BUILD(XmlNamespace, ns);
 }
 
 v8::Handle<v8::Value>
@@ -53,7 +42,7 @@ XmlNamespace::Href(const v8::Arguments& args) {
   v8::HandleScope scope;
   XmlNamespace *ns = LibXmlObj::Unwrap<XmlNamespace>(args.This());
   assert(ns);
-  return ns->get_href();
+  return scope.Close(ns->get_href());
 }
 
 v8::Handle<v8::Value>
@@ -61,7 +50,7 @@ XmlNamespace::Prefix(const v8::Arguments& args) {
   v8::HandleScope scope;
   XmlNamespace *ns = LibXmlObj::Unwrap<XmlNamespace>(args.This());
   assert(ns);
-  return ns->get_prefix();
+  return scope.Close(ns->get_prefix());
 }
 
 v8::Handle<v8::Value>

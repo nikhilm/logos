@@ -2,8 +2,8 @@
 #ifndef SRC_XML_ELEMENT_H_
 #define SRC_XML_ELEMENT_H_
 
-#include "./libxmljs.h"
-#include "./xml_node.h"
+#include "libxmljs.h"
+#include "xml_node.h"
 
 namespace libxmljs {
 
@@ -29,6 +29,8 @@ class XmlElement : public XmlNode {
   static v8::Handle<v8::Value> AddChild(const v8::Arguments& args);
   static v8::Handle<v8::Value> NextElement(const v8::Arguments& args);
   static v8::Handle<v8::Value> PrevElement(const v8::Arguments& args);
+  static v8::Handle<v8::Value> AddPrevSibling(const v8::Arguments& args);
+  static v8::Handle<v8::Value> AddNextSibling(const v8::Arguments& args);
 
   void set_name(const char* name);
 
@@ -44,6 +46,9 @@ class XmlElement : public XmlNode {
   v8::Handle<v8::Value> get_content();
   v8::Handle<v8::Value> get_next_element();
   v8::Handle<v8::Value> get_prev_element();
+  void add_prev_sibling(XmlElement* element);
+  void add_next_sibling(XmlElement* element);
+  XmlElement *import_element(XmlElement* element);
 };
 
 }  // namespace libxmljs
