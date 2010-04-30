@@ -1,4 +1,4 @@
-logos-api(3) - logos API
+logos-api(3) - Logos API
 ==============================
 
 ## SYNOPSIS
