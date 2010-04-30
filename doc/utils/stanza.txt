@@ -1,0 +1,83 @@
+logos-stanza(3) - Logos Stanza
+==============================
+
+## SYNOPSIS
+
+The Stanza class is a lightweight XML tree representation with JavaScript based validation used internally throughout Logos.
+
+## RATIONALE
+
+Why have Stanza when `xml.Document` is available from `libxmljs`?
+
+It presents a more JavaScripty view and shorter named functions to access children and attributes. In addition `xml.Element` has a serious limitation of not having a direct `toString()` method. In XMPP, stanza's are often written individually once the stream is open. This is provided by `Stanza`.
+
+## API
+
+    var Stanza = require('utils/stanza').Stanza;
+    
+### new Stanza(name, attrs, text)
+
+Creates a new Stanza with tag name `name` as the top-level. Optional `attrs` may be passed as an object literal. `text` is an optional string. NOTE: If `text` is required, but `attrs` are not, make sure you pass an empty literal, `{}`.
+
+    var attrs = { to: "romeo@example.net", from: "juliet@example.com/balcony", type: "chat"};
+    var s = new Stanza("message", attrs);
+    
+### Stanza.appendChild(stanza)
+
+Append `stanza` to this Stanza. It is recommended to use `tag()` instead of this.
+
+### Stanza.tag(name, attrs, text)
+
+Inserts a new child Stanza of type `name`, with attributes `attrs` and text `text` into this Stanza. Returns the child Stanza so that multiple calls can be chained.
+
+    s.tag("body", {}, "Wherefore art ")
+       .tag("strong", {}, "thou!");
+       
+    --> <body>Wherefore art <strong>thou!</strong></body>
+    
+### Stanza.parent()
+
+Returns the parent Stanza of this Stanza or `null` if this is a top-level Stanza.
+
+### Stanza.root()
+
+From any point within the tree, return the top-level Stanza.
+
+### Stanza.c(name)
+
+Returns the *first* child with name `name` or `null` if no child exists.
+
+### Stanza.cs(name)
+
+Returns all children with name `name` as a list.
+
+### Stanza.a(name)
+
+Returns the value of the attribute with name `name`.
+
+### Stanza.t(text)
+
+A multi-purpose function to set *or* get text.
+
+ * `Stanza.t()`:
+   Returns a string containing the text of this Stanza and nested Stanzas *in order*. This means that child *tags* are skipped, but their text is returned. To get a XML representation of the content of this tag, use `Stanza.content()`
+   
+       // if s is <message>This is a <em>test</em></message>
+       s.t() --> This is a test
+       s.content() --> This is a <em>test</em>
+       s.toString() --> <message>This is a <em>test</em></message>
+
+ * `Stanza.t(text)`
+   *Appends* a new text node to this Stanza. To completely replace the text of this Stanza, use `Stanza.setText()`.
+   
+### Stanza.setText(text)
+
+*Removes* all existing text nodes. Then appends `text` as a new child. Which means any child nodes will come before `text`.
+
+### Stanza.content()
+
+Returns the string representation of everything *within* the tag, which means the tag name and attributes of this Stanza are excluded. See `Stanza.t()` for an example.
+
+### Stanza.toString()
+
+Returns the string representation of the *entire* tag, including the tag name and attributes in proper XML. See `Stanza.t()` for an example and differences with `Stanza.content()` and `Stanza.t()`.
