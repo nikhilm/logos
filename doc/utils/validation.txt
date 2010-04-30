@@ -3,6 +3,6 @@ logos-validation(3) - Stanza Validation framework
 
 ## SYNOPSIS
 
-This validation framework extends [Stanza](utils/stanza.3.html)s to be validated in a declarative
+This validation framework extends [Stanza](stanza.3.html)s to be validated in a declarative
 manner by defining an object literal with various attributes to which the schema must conform. 
 
