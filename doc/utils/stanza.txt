@@ -55,19 +55,18 @@ Returns all children with name `name` as a list.
 
 Returns the value of the attribute with name `name`.
 
-### Stanza.t(text)
-
-A multi-purpose function to set *or* get text.
-
- * `Stanza.t()`:
+### Stanza.t()
    Returns a string containing the text of this Stanza and nested Stanzas *in order*. This means that child *tags* are skipped, but their text is returned. To get a XML representation of the content of this tag, use `Stanza.content()`
    
-       // if s is <message>This is a <em>test</em></message>
-       s.t() --> This is a test
-       s.content() --> This is a <em>test</em>
-       s.toString() --> <message>This is a <em>test</em></message>
+Example:
 
- * `Stanza.t(text)`
+     // if s is <message>This is a <em>test</em></message>
+     s.t() --> This is a test
+     s.content() --> This is a <em>test</em>
+     s.toString() --> <message>This is a <em>test</em></message>
+
+
+### Stanza.t(text)
    *Appends* a new text node to this Stanza. To completely replace the text of this Stanza, use `Stanza.setText()`.
    
 ### Stanza.setText(text)
