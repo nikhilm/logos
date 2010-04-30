@@ -6,3 +6,73 @@ logos-validation(3) - Stanza Validation framework
 This validation framework extends [Stanza](stanza.3.html)s to be validated in a declarative
 manner by defining an object literal with various attributes to which the schema must conform. 
 
+## RATIONALE
+
+It is error-prone and boring to write half a dozen if statements to see whether a Stanza matches a certain schema, such as having the right namespace on the root element and then requiring certain children and so on. The Validation framework wraps this up in a convenient `valid()` function to which you simply pass a schema describing the conditions and Stanza structure you are looking for. It accepts string comparisons as well as regular expressions and custom functions.
+
+## API
+
+### Stanza.valid(schema)
+
+Returns `true` if the tag matches the schema, `false` otherwise.
+
+## VALUE EXPRESSIONS
+
+A `value expression` is one of these:
+
+ * A `string` which is compared using the equality operator `==`.
+ * A `regular expression` which is checked using `String.test(regex)`.
+ * A `function` which receives the value to check as its only argument. The function should return `true` if the value is acceptable, `false` otherwise.
+
+## SCHEMA SYNTAX
+
+A schema is defined by an object-literal with the following keys, each of which is optional:
+
+* `name` - a value expression to match the tag name.
+* `attrs` - an object-literal containing attribute names as keys and value expressions to compare against.
+* `children` - a `list` of object-literals, each of which attempts to match *atleast one* of the Stanza's children. Each child schema is the same as a top-level schema being matched against that child. If it doesn't match any one, that child fails, leading to failure of the overall expression.
+* `text` - a value expression which will be compared with the text (`Stanza.t()`) of the Stanza.
+ 
+If either of these test fails, the *entire validation* fails. So this can't be used for an optional validation.
+
+
+## EXAMPLE
+
+Original XML:
+
+    <iq from='example.com' type='error' id='sess_1'>
+    <session xmlns='urn:ietf:params:xml:ns:xmpp-session'/>
+    <error type='auth'>
+      <forbidden
+          xmlns='urn:ietf:params:xml:ns:xmpp-stanzas'/>
+    </error>
+    </iq>
+
+Assuming `s` is a Stanza obtained from [xmppparser](../core/xmppparser.3.html).
+
+    var schema =
+    {name:"iq"
+    ,attrs: {type:"error"
+            ,id: /^sess_.*/ // any session id
+            }
+    ,children: [
+       // must have atleast one child session
+       {name: "session"
+       ,attrs: {xmlns: "urn:ietf:params:xml:ns:xmpp-session"}
+       }
+
+       // and one child error
+     , {name: "error"
+       ,attrs: { type: /.*/ } // any error
+       ,children: [
+         {name: "forbidden"
+         ,attrs: {xmlns: function(ns) {
+                   return ns == "urn:ietf:params:xml:ns:xmpp-stanzas";
+                 }}
+         }
+        ]
+       }
+     ]
+    }
+			 
+    assert.ok(s.valid(schema), "Bad error!");
