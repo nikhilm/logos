@@ -8,7 +8,7 @@ var c_module = require('../core/modulemanager');
 var log = require('../utils/logging').log;
 
 var SASL_NS = 'urn:ietf:params:xml:ns:xmpp-sasl';
-// TODO read from palantir config file
+// TODO read from Logos config file
 var MAX_TRIES = 2;
 
 var saslCallback = function(session, property, saslSession) {

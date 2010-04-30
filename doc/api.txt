@@ -1,16 +1,16 @@
-palantir-api(3) - Palantir API
+logos-api(3) - logos API
 ==============================
 
 ## SYNOPSIS
 
-The Palantir API documents the public functions provided
-by Palantir core modules to allow writing plugins to add
+The logos API documents the public functions provided
+by logos core modules to allow writing plugins to add
 XMPP features. It is meant to be a reference for developers.
-Users should check out the palantir(1) documentation.
+Users should check out the logos(1) documentation.
 
 ## API Overview
 
-The **Palantir API** is divided into the following modules:
+The **Logos API** is divided into the following modules:
 
  * [util/stanza](utils/stanza.3.html):
  Internal XMPP Stanza objects
@@ -31,7 +31,7 @@ x Provides functions to allow plugins to be notified of events and so on.
 
 ## Plugins
 
-Plugins are Javascript modules which add extra functionality to **Palantir**. This may involve supporting extra transports, using a different wire protocol ( eg. BOSH ) or some thing wacky like bots.
+Plugins are Javascript modules which add extra functionality to **logos**. This may involve supporting extra transports, using a different wire protocol ( eg. BOSH ) or some thing wacky like bots.
 
 **TODO**: Write info about writing plugins.
 
@@ -41,4 +41,4 @@ Nikhil Marathe. See AUTHORS for full list of contributors.
 
 ## SEE ALSO
 
-palantir(1), palantir-plugins(3), palantir-stanza(3), palantir-validation(3), palantir-logging(3), palantir-session(3), palantir-modulemanager(3), palantir-eventbus(3), palantir-config(3), palantir-xmppparser(3), node(1)
+logos(1), logos-plugins(3), logos-stanza(3), logos-validation(3), logos-logging(3), logos-session(3), logos-modulemanager(3), logos-eventbus(3), logos-config(3), logos-xmppparser(3), node(1)

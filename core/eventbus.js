@@ -5,5 +5,3 @@ var EventBus = function() {
 }
 
 EventBus.prototype = Object.create(new events.EventEmitter());
-
-exports.instance = new EventBus();

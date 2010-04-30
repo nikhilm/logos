@@ -18,7 +18,7 @@ module.handleStanza('iq', function(session, stanza) {
         var doc = new xml.Document();
         doc.node('iq', {type: 'result', id: stanza.attrs.id.value})
             .node('query', {xmlns: REGISTER_NS})
-             .node('instructions', {}, 'localhost/palantir registration').parent()
+             .node('instructions', {}, 'localhost/logos registration').parent()
              .node('username').parent()
              .node('password').parent();
         log("debug", "Sending ", doc.toString());

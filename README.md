@@ -1,4 +1,4 @@
-Palantir will become a XMPP server in node.js
+Logos will become a XMPP server in node.js
 
 Uses libxmljs for parsing
 

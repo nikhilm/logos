@@ -5,13 +5,31 @@ var c_parser = require('core/xmppparser');
 var Stanza = require('utils/stanza').Stanza;
 
 var log = require('utils/logging').log;
-var eventbus = require('core/eventbus').instance;
+var c_eventbus = require('core/eventbus');
 
 exports.Session = Session = function(connection) {
     this.connection = connection;
     this.ready = false;
     this.authenticated = false;
+    this.eventbus = new c_eventbus.EventBus();
+    // TODO: When server-to-server supported
+    this.type = "c2s";
 
+    this.initParser();
+
+}
+
+Session.prototype.initParser = function() {
+    if( this.parser ) {
+	// cleanup callbacks and so on
+	this.eventbus.removeAllListeners('stream-features');
+	this.parser.removeListener('stanza', this.handleStanza);
+        this.connection.addListener('data', sys.debug);
+        this.connection.addListener('data', this.parser.parse.bind(this.parser));
+        this.connection.addListener('end', this.endConnection.bind(this));
+        this.connection.addListener('timeout', this.connectionError.bind(this));
+	this.connection.addListener('error', this.connectionError.bind(this));
+    }
     this.parser = new c_parser.Parser();
 
     var self = this;
@@ -28,6 +46,7 @@ exports.Session = Session = function(connection) {
         // var ok = self.validateStream(attrs);
         // Including major minor version checks
 
+	this.eventbus.emit('stream-open', this);
         // TODO plugin hostname
         // TODO generate random id
         var doc = new Stanza("stream:stream", {from: 'localhost'
@@ -49,14 +68,13 @@ exports.Session = Session = function(connection) {
 
     this.parser.addListener("stanza", this.handleStanza.bind(this));
 
-    connection.addListener('data', sys.debug);
-    connection.addListener('data', this.parser.parse.bind(this.parser));
-    connection.addListener('end', this.endConnection.bind(this));
-    connection.addListener('timeout', this.connectionError.bind(this));
-    connection.addListener('error', this.connectionError.bind(this));
-}
-
+    this.connection.addListener('data', sys.debug);
+    this.connection.addListener('data', this.parser.parse.bind(this.parser));
+    this.connection.addListener('end', this.endConnection.bind(this));
+    this.connection.addListener('timeout', this.connectionError.bind(this));
+    this.connection.addListener('error', this.connectionError.bind(this));
 Session.prototype = Object.create(new events.EventEmitter());
+}
 
 // just to abstract stuff from other components
 // like plugins
@@ -79,26 +97,28 @@ Session.prototype.writeStreamFeatures = function() {
     // contained within
     // TODO register on the global event bus
     var wait = true;
-    eventbus.addListener('stream-features', function() {
+    this.eventbus.addListener('stream-features', function() {
         wait = false;
     });
 
+    sys.debug("---------");
     features = ["<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>"];
     // it might need more arguments other than
     // session and session should probably contain
     // more information about the connection
-    eventbus.emit('stream-features', this, features);
-
+    this.eventbus.emit('stream-features', this, features);
     while(wait) {
     }
 
+    sys.debug("---------");
     log("debug", "Stream features are", features);
     //TODO remove our fake listener
     this.connection.write("<stream:features>"+features.join('\n')+"</stream:features>");
+    sys.debug("---------");
 };
 
 Session.prototype.handleStanza = function(stanza) {
-    eventbus.emit("stanza", this, stanza);
+    this.eventbus.emit("stanza", this, stanza);
 }
 
 Session.prototype.endConnection = function() {
@@ -122,4 +142,11 @@ Session.prototype.streamError = function(error) {
 
     log("debug", "Stream error", error, doc.toString());
     this.connection.write(doc.toString());
+}
+
+Session.prototype.setAuthenticated = function() {
+    this.type += '_auth';
+    this.authenticated = true;
+    this.initParser();
+    // restart the stream by creating a new parser
 }

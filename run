@@ -1,11 +1,11 @@
 #!/usr/bin/env sh
-export PALANTIR_PATH=`pwd`
+export LOGOS_PATH=`pwd`
 
 export NODE_PATH=\
 $NODE_PATH\
-:$PALANTIR_PATH\
-:$PALANTIR_PATH/deps/libxmljs\
-:$PALANTIR_PATH/deps/sasljs\
-:$PALANTIR_PATH/deps/proto/lib
+:$LOGOS_PATH\
+:$LOGOS_PATH/deps/libxmljs\
+:$LOGOS_PATH/deps/sasljs\
+:$LOGOS_PATH/deps/proto/lib
 
 node "$@"

@@ -1,4 +1,4 @@
-palantir-eventbus(3) - Palantir Event Bus
+logos-eventbus(3) - Logos Event Bus
 ==============================================
 
 ## SYNOPSIS
@@ -13,7 +13,7 @@ To use the Event Bus, require it:
     var eventbus = new require('eventbus').EventBus();
     
 But you will usually want to use the one provided by the session
-since that is the only one that other `Palantir` components will
+since that is the only one that other `logos` components will
 be listening on. If you have a `session` you can simply do:
 
     session.eventbus.function(...)
