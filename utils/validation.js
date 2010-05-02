@@ -96,6 +96,7 @@ Stanza.prototype.valid = function(schema) {
 		c.forEach(function(child) {
 		    results.push( child.valid(cSchema));
 		});
+//TODO: possible bug, don't directly return.
 		return results.some(function(elt) { return elt; });
 	    }
 	    else if( !c.valid(cSchema) ) {
