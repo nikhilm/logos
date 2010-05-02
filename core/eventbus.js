@@ -1,7 +1,9 @@
 var sys = require('sys');
 var events = require('events');
 
-var EventBus = function() {
+exports.EventBus = function() {
 }
 
-EventBus.prototype = Object.create(new events.EventEmitter());
+exports.EventBus.prototype = Object.create(new events.EventEmitter());
+
+exports.instance = new exports.EventBus();
