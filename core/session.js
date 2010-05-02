@@ -2,10 +2,11 @@ var sys = require('sys');
 var events = require('events');
 
 var c_parser = require('core/xmppparser');
+var c_eventbus = require('core/eventbus');
 var Stanza = require('utils/stanza').Stanza;
 
 var log = require('utils/logging').log;
-var c_eventbus = require('core/eventbus');
+var eventbus = require('core/eventbus').instance;
 
 exports.Session = Session = function(connection) {
     this.connection = connection;
@@ -46,7 +47,7 @@ Session.prototype.initParser = function() {
         // var ok = self.validateStream(attrs);
         // Including major minor version checks
 
-	this.eventbus.emit('stream-open', this);
+        self.eventbus.emit('stream-open', self);
         // TODO plugin hostname
         // TODO generate random id
         var doc = new Stanza("stream:stream", {from: 'localhost'
@@ -101,7 +102,6 @@ Session.prototype.writeStreamFeatures = function() {
         wait = false;
     });
 
-    sys.debug("---------");
     features = ["<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>"];
     // it might need more arguments other than
     // session and session should probably contain
@@ -110,11 +110,9 @@ Session.prototype.writeStreamFeatures = function() {
     while(wait) {
     }
 
-    sys.debug("---------");
     log("debug", "Stream features are", features);
     //TODO remove our fake listener
     this.connection.write("<stream:features>"+features.join('\n')+"</stream:features>");
-    sys.debug("---------");
 };
 
 Session.prototype.handleStanza = function(stanza) {
@@ -148,5 +146,4 @@ Session.prototype.setAuthenticated = function() {
     this.type += '_auth';
     this.authenticated = true;
     this.initParser();
-    // restart the stream by creating a new parser
 }
