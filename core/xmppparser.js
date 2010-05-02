@@ -45,6 +45,7 @@ exports.Parser.prototype = Object.create(new events.EventEmitter());
 
 exports.Parser.prototype._errorHandler = function( err ) {
     log( "debug", "Parser: parse error", err );
+    log("debug", "Parser: ", sys.inspect(this._tagStack));
     this.emit( 'error', err, this._tagStack );
 },
 
