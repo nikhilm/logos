@@ -17,7 +17,7 @@ exports.Session = Session = function(connection) {
     this.type = "c2s";
 
     this.initParser();
-
+    eventbus.emit("session-created", this);
 }
 
 Session.prototype.initParser = function() {
