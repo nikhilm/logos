@@ -25,7 +25,9 @@ var saslCallback = function(session, property, saslSession) {
 }
 
 // TODO hook into session start event
-c_module.hook('stream-features', function(session, features) {
+c_module.hookSession('stream-features', function(session, features) {
+    if( session.authenticated )
+	return;
     var handler = sasl.createServerSession("xmpp", function(property, saslSession) {
         return saslCallback(session, property, saslSession);
     });
@@ -68,7 +70,6 @@ var performSaslStep = function(session, response) {
         session.write(success());
     }
     else if( reply.status == sasl.GSASL_NEEDS_MORE ) {
-        log("debug", "Needs MORE");
         session.write(challenge(reply.data));
     }
     else {
