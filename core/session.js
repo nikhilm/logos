@@ -21,15 +21,11 @@ exports.Session = Session = function(connection) {
 }
 
 Session.prototype.initParser = function() {
+    this.connection.pause();
     if( this.parser ) {
 	// cleanup callbacks and so on
-	this.eventbus.removeAllListeners('stream-features');
-	this.parser.removeListener('stanza', this.handleStanza);
-        this.connection.addListener('data', sys.debug);
-        this.connection.addListener('data', this.parser.parse.bind(this.parser));
-        this.connection.addListener('end', this.endConnection.bind(this));
-        this.connection.addListener('timeout', this.connectionError.bind(this));
-	this.connection.addListener('error', this.connectionError.bind(this));
+	this.connection.removeAllListeners("data");
+	this.parser = null;
     }
     this.parser = new c_parser.Parser();
 
@@ -69,12 +65,11 @@ Session.prototype.initParser = function() {
 
     this.parser.addListener("stanza", this.handleStanza.bind(this));
 
-    this.connection.addListener('data', sys.debug);
     this.connection.addListener('data', this.parser.parse.bind(this.parser));
     this.connection.addListener('end', this.endConnection.bind(this));
     this.connection.addListener('timeout', this.connectionError.bind(this));
     this.connection.addListener('error', this.connectionError.bind(this));
-Session.prototype = Object.create(new events.EventEmitter());
+    this.connection.resume();
 }
 
 // just to abstract stuff from other components
