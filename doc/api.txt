@@ -35,6 +35,12 @@ Plugins are Javascript modules which add extra functionality to **logos**. This 
 
 **TODO**: Write info about writing plugins.
 
+## OTHER
+
+### State saving
+
+Modules and plugins should avoid saving global state if it is session dependent. Multiple sessions might fire different events in different orders. It is recommended to store any session specific information in the session object passed to event listeners.
+
 ## AUTHORS
 
 Nikhil Marathe. See AUTHORS for full list of contributors.
