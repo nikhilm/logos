@@ -1,6 +1,4 @@
-* Add SASL authentication as a module
-* Add in-band registration as a module
-* Create simple declarative xml structure validator?
 * Set xmlns back to null once ^^^^ is done
+* Add some tests for actual SASL authentication.
 * ...
 * ...Have fun!
