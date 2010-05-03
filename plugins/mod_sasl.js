@@ -66,7 +66,9 @@ var performSaslStep = function(session, response) {
     var reply = session.saslHandler.step( response );
     if( reply.status == sasl.GSASL_OK ) {
         log("debug", "SASL Authentication succeeded");
-	session.setAuthenticated();
+        //TODO set hostname also
+        log("debug", "user", session.saslHandler.property("authid"));
+	session.setAuthenticated(session.saslHandler.property("authid") + "@localhost");
         session.write(success());
     }
     else if( reply.status == sasl.GSASL_NEEDS_MORE ) {

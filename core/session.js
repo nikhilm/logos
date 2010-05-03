@@ -97,7 +97,7 @@ Session.prototype.writeStreamFeatures = function() {
         wait = false;
     });
 
-    features = ["<bind xmlns='urn:ietf:params:xml:ns:xmpp-bind'/>"];
+    features = [];
     // it might need more arguments other than
     // session and session should probably contain
     // more information about the connection
@@ -137,8 +137,9 @@ Session.prototype.streamError = function(error) {
     this.connection.write(doc.toString());
 }
 
-Session.prototype.setAuthenticated = function() {
+Session.prototype.setAuthenticated = function(jid) {
     this.type += '_auth';
+    this.jid = jid;
     this.authenticated = true;
     this.initParser();
 }
