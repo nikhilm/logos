@@ -12,6 +12,7 @@ global.LOG_LEVEL = "debug";
 
 // TODO load config
 // TODO load plugins
+c_modulemanager.load('mod_bind');
 c_modulemanager.load('mod_register');
 c_modulemanager.load('mod_sasl');
 
