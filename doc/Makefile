@@ -7,4 +7,4 @@ all: $(patsubst %.txt,%.3.html,$(wildcard *.txt core/*.txt utils/*.txt))
 
 .PHONY: clean
 clean:
-	find -name '*.3.html'|xargs rm
+	-find -name '*.3.html'|xargs rm
