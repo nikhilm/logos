@@ -1,3 +1,5 @@
+### **This project is DEAD! Move on :)**
+
 Logos will become a XMPP server in node.js
 
 Uses libxmljs for parsing
